@@ -2,8 +2,6 @@
 from asyncio.log import logger
 import email
 from email import message
-# from re import I
-# from telnetlib import PRAGMA_HEARTBEAT
 
 from celery import shared_task
 
@@ -15,7 +13,7 @@ from django.core.mail import send_mail
 
 from Library_mngmnt.celery import app
 
-from .models import User, IssueBook
+from .models import IssueBook
 
 import datetime
 
@@ -45,11 +43,12 @@ def send_reminder():
 
                 mail = is_date.user.email
                 title = is_date.book.title
+                author = is_date.book.author
 
 
                 send_mail(
                     subject = 'Book Return Date Exceeds.!!!',
-                    message = 'Reminder: Your Book' '\t' f"{title}, return date exceeds 7 days, \n \n Kindly return the same ASAP..! \n \n Happy Reading",
+                    message = 'Reminder: Your Book' '\t' f"{title} by {author}, return date exceeds 7 days, \n \n Kindly return the same ASAP..! \n \n Happy Reading...",
                     from_email = settings.EMAIL_HOST_USER,
                     recipient_list = [mail],
                     fail_silently = False,

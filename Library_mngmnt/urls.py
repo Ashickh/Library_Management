@@ -20,24 +20,29 @@ from library import views
 # from library import views
 # from macpath import basename
 
-from rest_framework.routers import DefaultRouter
-from rest_framework.authtoken.views import obtain_auth_token
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-router = DefaultRouter()
-router.register('library/books', views.BookViewSet, basename="books")
+from rest_framework.authtoken.views import obtain_auth_token
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 # router.register('library/users',views.UserViewSet, basename="users")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('api/v1/token',obtain_auth_token),
     path('library/register', views.UserRegistrationView.as_view()),
-    path('library/token', TokenObtainPairView.as_view()),
+    path('library/user/update/<int:id>', views.UserRegistrationView.as_view()),
+    path('library/user/erase/<int:id>', views.UserRegistrationView.as_view()),
+    path('library/login', TokenObtainPairView.as_view()),
     path('library/token/refresh', TokenRefreshView.as_view()),
+    path('library/books', views.BookView.as_view()),
+    path('library/books/<int:id>', views.BookView.as_view()),
     path('library/user/issue', views.IssueBookView.as_view()),
     path('library/user/return/<int:id>', views.IssueBookView.as_view()),
     path('library/user/search', views.SearchView.as_view()),
     path('library/user/bookdetail/<int:id>', views.BookDetails.as_view()),
 
 
-]+router.urls
+]

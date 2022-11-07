@@ -21,6 +21,7 @@ app.conf.update(timezone = 'Asia/Kolkata')
 
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
+
 # celery beat settings
 
 app.autodiscover_tasks(lambda:settings.INSTALLED_APPS)
