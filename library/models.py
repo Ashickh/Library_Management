@@ -11,6 +11,8 @@ class Book(models.Model):
     author = models.CharField(max_length=100)
     language = models.CharField(max_length=100)
     summary = models.CharField(max_length=300)
+    image = models.ImageField(upload_to="files",null=True,blank=True)
+    files = models.FileField(upload_to="files",null=True,blank=True)
 
     class Meta:
         unique_together = ('title', 'author',)

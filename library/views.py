@@ -9,12 +9,15 @@ from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework import permissions, authentication
 from library.tasks import *
-from datetime import date, timedelta
+from datetime import date, timedelta,datetime
+from time import strftime
 from library.serializers import BookSerializer, UserRegistrationSerializer, IssueSerializer
 import logging, traceback
 logger = logging.getLogger('django')
 
 # Create your views here.
+
+
 
 """CRUD for Book """
 class BookView(APIView):
@@ -25,6 +28,10 @@ class BookView(APIView):
     
     def get(self, request, *args, **kwargs):
         try:
+
+
+            today = datetime.now()
+            print(today)
             response = {'status':status.HTTP_400_BAD_REQUEST, 'message': "Books Not Found"}
             issued_list = Book.objects.all()
             serializer = self.serializer_class(issued_list, many=True)
@@ -36,7 +43,7 @@ class BookView(APIView):
             logger.info('inside get books')
             return Response(response, status=status.HTTP_200_OK)
         except Exception:
-            logger.info('not got into the books')
+            logger.error('not got into the books')
             return Response(response,status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
@@ -52,6 +59,7 @@ class BookView(APIView):
 
                 logger.info('inside post books')
                 return Response(response, status=status.HTTP_201_CREATED)
+            logger.error('failed post books')
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self,request,*args,**kwargs):
@@ -195,6 +203,7 @@ class IssueBookView(APIView):
             language = books.language
 
             date = request.data['issue_date']
+            print(date)
 
             if serializer.is_valid():
 
@@ -276,12 +285,16 @@ class BookDetails(APIView):
                 response = {'status':status.HTTP_400_BAD_REQUEST, 'message': "Book Details Not Found"}
                 id = kwargs.get('id')
                 issued_list = IssueBook.objects.get(id = id)
+                date = issued_list.issue_date.strftime("%d-%m-%Y")
+                print(date)
+
                 serializer = self.serializer_class(issued_list)
                 
                 response["status"] = status.HTTP_200_OK
                 response["data"] = serializer.data
                 response["message"] = 'Book Details Fetched Succesfully'
 
+                logger.info('inside issue book details')
                 return Response(response, status=status.HTTP_200_OK)
             except Exception:
                 return Response(response,status=status.HTTP_400_BAD_REQUEST)
@@ -298,30 +311,65 @@ class SearchView(APIView):
     def post(self, request):
 
         try:
-                response = {'status':status.HTTP_400_BAD_REQUEST, 'message': "Book not available"}
+            response = {'status':status.HTTP_400_BAD_REQUEST, 'message': "Book not available"}
 
-                title = request.data['name']
-                book_obj = Book.objects.filter(title__icontains=title)
-                # print(instance)
-                book_list = []
-                for i in book_obj:
-                    book = i.title
+            name = request.data['name']
+            book_obj = Book.objects.filter(title__icontains = name)
+            # print(instance)
+            book_list = []
+            for books in book_obj:
+                book = books.title
+            
+                book_list.append(book)
                 
-                    book_list.append(book)
-                    
-                    response["status"] = status.HTTP_200_OK
-                    response["data"] = book_list
-                    response["message"] = 'Book is Available'
-                print(book_list)
-                logger.info(book_list)
-                return Response(response)
-                
+                response["status"] = status.HTTP_200_OK
+                response["data"] = book_list
+                response["message"] = 'Book is Available'
+            print(book_list)
+            logger.info(book_list)
+            return Response(response)
+            
                 # else:
                 #     return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
         except Exception as e:
+             print('Exception Occured',e)
+            
+
+class FilterView(APIView):
+
+    def post(self, request):
+
+        try:
+            response = {'status':status.HTTP_400_BAD_REQUEST, 'message': "Data Fetching Failed"}
+
+            from_date = request.data['from']
+            to_date = request.data['to']
+            data = IssueBook.objects.filter(issue_date__range=[from_date,to_date])
+            # print(instance)
+            data_list = []
+            for dates in data:
+                title = dates.book.title
+                user = dates.user.username
+            
+                data_list.append(title)
+                data_list.append(user)
+                
+                # data_set = dict(data_list)
+                
+              
+            print(data_list)
+
+            response["status"] = status.HTTP_200_OK
+            response["data"] = data_list
+            response["message"] = 'Data Fetched Successfully'
+            return Response(response)
+
+
+        except Exception as e:
             print('Exception Occured',e)
+            logger.error(e)
 
         
 

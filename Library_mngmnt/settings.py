@@ -30,6 +30,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,18 +46,28 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_extensions',
     'django_celery_results',
+    'django_db_logger',
+    'testapp',
 
     
 ]
 
 REST_FRAMEWORK = {
+
+
     
     'DEFAULT_AUTHENTICATION_CLASSES': (
         
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+
+    'DATE_FORMAT': "%d %B %Y"
     
 }
+
+
+
+
 
 SIMPLE_JWT = {
 'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
@@ -196,32 +207,41 @@ LOGGING ={
     'version':1,
     'loggers':{
         'django':{
-            'handlers':['library_log','library_log_2'],
+            'handlers':['library_log','log_file'],
             'level': 'DEBUG',
         }
     },
     'handlers':{ 
         'library_log':{
             'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': './logs/debug{:%Y-%m-%d}.log'.format(datetime.now()),
-            'formatter': 'simpleRe',
+            'class': 'django_db_logger.db_log_handler.DatabaseLogHandler',
+            
+            # 'formatter': 'db_formatter',
         },
-          'library_log_2':{
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': './logs/debug2_{:%Y-%m-%d}.log'.format(datetime.now()),
-            'formatter': 'simple',
+        'log_file' : {
+            'level' : 'INFO',
+            'class' : 'logging.FileHandler',
+            'filename': './logs/debug{:%Y-%m-%d}.log'.format(datetime.now()),
+            'formatter': 'file_formatter',
         }
     },
     'formatters':{
-        'simpleRe': {
-            'format': '{levelname} {module} {message} {asctime} {process:d} {thread:d}',
-            'style': '{', 
-        },
-        'simple': {
+        # 'db_formatter': {
+        #     'format': ' {module} {message} {asctime}',
+        #     'style': '{', 
+        # },
+        'file_formatter': {
             'format': '{levelname} {module} {message} {asctime}',
             'style': '{', 
         }
     }
 }
+
+
+
+# Actual directory user files go to
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'Library_mngmnt/images')
+
+
+# URL used to access the media
+MEDIA_URL = '/media/'

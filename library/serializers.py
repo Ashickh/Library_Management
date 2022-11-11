@@ -27,6 +27,8 @@ class BookSerializer(serializers.ModelSerializer):
 
 class IssueSerializer(serializers.ModelSerializer):
 
+   
+
     class Meta:
         model = IssueBook
         fields = ["book", "user", "issue_date", "return_date", "status"]

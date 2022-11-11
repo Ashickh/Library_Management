@@ -14,8 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from library import views
+# from testapp.views import StudentGeneric
 # from macpath import basename
 # from library import views
 # from macpath import basename
@@ -26,11 +27,14 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from django.conf import settings
+from django.conf.urls.static import static
 
 # router.register('library/users',views.UserViewSet, basename="users")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('testapp/', include('testapp.urls')),
     # path('api/v1/token',obtain_auth_token),
     path('library/register', views.UserRegistrationView.as_view()),
     path('library/user/update/<int:id>', views.UserRegistrationView.as_view()),
@@ -43,6 +47,9 @@ urlpatterns = [
     path('library/user/return/<int:id>', views.IssueBookView.as_view()),
     path('library/user/search', views.SearchView.as_view()),
     path('library/user/bookdetail/<int:id>', views.BookDetails.as_view()),
+    path('library/user/filter', views.FilterView.as_view()),
+    
+    # path('student/get', views.StudentGeneric.as_view()),
 
 
-]
+]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
